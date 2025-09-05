@@ -124,9 +124,13 @@ void updateData() {
   new_ts = millis();
   dt = (new_ts - ts) / 1000.0;
   ts = new_ts;
-  if (responseStatus == OpenThermResponseStatus::SUCCESS) {
+  if (client.connected() && responseStatus == OpenThermResponseStatus::SUCCESS) {
     op = pid(sp, t, t_last, ierr, dt);
     ot.setBoilerTemperature(op);
+  } else {
+    // No WiFi → disable heating
+    heatingEnabled = false;
+    ot.setBoilerTemperature(0);
   }
   t_last = t;
 
